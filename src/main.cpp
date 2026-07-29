@@ -1,10 +1,11 @@
 #include<iostream>
 #include"bignum.h"
-
+using namespace bignum;
 int main(){
-    bignum::bigint big("10");
-    bignum::bigint big1("-100");
-    std::cout<<big.negate().to_str()<<std::endl;
-    std::cout<<big1.negate().to_str()<<std::endl;
+    bigint a1("-1000");
+    bigint b1("-500");
+    bool f = a1>=b1;
+    bool f1 = a1<b1;
+    std::cout<< f << ' ' << f1;
     return 0;
 }

@@ -7,9 +7,13 @@ namespace bignum {
         bigint();
         bigint(std::string value);
         ~bigint();
-
-        bool negative = 0;
         std::vector<uint64_t> parts;
+        void set_negative(bool is_neg){
+            if (is_zero()) negative = false;
+            else negative = is_neg;
+        }
+        bool is_zero() const;
+        bool is_negative() const { return negative; }
         bigint& add(const bigint &add);
         bigint& sub(const bigint &other);
         std::string to_str();
@@ -53,12 +57,11 @@ namespace bignum {
         0x8AC7230489E80000ULL
         };
         const size_t MAX_GROUP_DIGITS = 19;
+        bool negative = 0;
         uint64_t str_to_uint64_t(const char* start,size_t count);
         uint64_t div_by_1e19(std::vector<uint64_t> &vec, uint64_t divisor);
         bigint& add_unsigned(const bigint &add);
         bigint& add_signed(const bigint &add);
         void multiply_add(uint64_t mult, uint64_t add);
-        bool is_zero() const;
-        
     };
 }

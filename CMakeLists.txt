@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14) # Версию 4.2 лучше снизить для совместимости, 3.14+ достаточно
+cmake_minimum_required(VERSION 3.14)
 project(BigNum CXX)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -15,7 +15,7 @@ add_executable(big_num src/main.cpp)
 target_link_libraries(big_num PRIVATE bignum_lib)
 
 find_package(GTest REQUIRED)
-add_executable(run_tests tests/test_main.cpp)
+add_executable(run_tests tests/test_main.cpp tests/bigint_comparison_test.cpp)
 target_link_libraries(run_tests PRIVATE bignum_lib GTest::gtest GTest::gtest_main)
 
 include(CTest)

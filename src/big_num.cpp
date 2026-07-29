@@ -30,6 +30,7 @@ uint64_t bignum::bigint::str_to_uint64_t(const char* start, size_t count) {
 }
 
 bignum::bigint::bigint(std::string value){
+    this->parts = {0};
     size_t index = 0;
     if(value[0]=='-'){ 
         this->negative = 1;
@@ -50,6 +51,7 @@ bignum::bigint::bigint(std::string value){
         multiply_add(powers[MAX_GROUP_DIGITS],val);
         offset+=MAX_GROUP_DIGITS;
     }
+    if(this->is_zero()) this->negative = 0;
 }
 
 void bignum::bigint::multiply_add(uint64_t mult,uint64_t add){
@@ -156,16 +158,16 @@ bignum::bigint bignum::bigint::operator~() &&{
     return std::move(*this);
 }
 
-bignum::bigint& bignum::bigint::sub(const bigint &other){
+// bignum::bigint& bignum::bigint::sub(const bigint &other){
 
-}
+// }
 
-bool bignum::bigint::compare_abs(bigint &other) const{
-    
-}
+// bool bignum::bigint::compare_abs(bigint &other) const{
+
+// }
 
 bool bignum::bigint::is_zero() const{
-    return this->parts[0]==0 && this->parts.size()==1;
+    return this->parts.size()==1 && this->parts[0]==0;
 }
 
 bignum::bigint bignum::bigint::operator-() const & {
@@ -204,12 +206,59 @@ bool bignum::bigint::operator<(bigint &other) const{
     if (this->negative && !other.negative) return 1;
     if (!this->negative && other.negative) return 0;
     if (this->negative == 0 && other.negative == 0){
-
+        if (this->parts.size()<other.parts.size()) return 1;
+        if (this->parts.size()>other.parts.size()) return 0;
+        for (size_t i = this->parts.size(); i >0 ; i--)
+        {
+            size_t idx = i-1;
+            if(this->parts[idx]< other.parts[idx]) return 1;
+        }
     }
-    
+    if (this->negative == 1 && other.negative == 1){
+        if (this->parts.size()<other.parts.size()) return 0;
+        if (this->parts.size()>other.parts.size()) return 1;
+        for (size_t i = this->parts.size(); i >0 ; i--)
+        {
+            size_t idx = i-1;
+            if(this->parts[idx]>other.parts[idx]) return 1;
+        }
+    }
+    return 0;
 }
 
+bool bignum::bigint::operator>(bigint &other) const{
+    if(is_zero() && other.is_zero()) return 0;
+    if (this->negative && !other.negative) return 0;
+    if (!this->negative && other.negative) return 1;
+    if (this->negative == 0 && other.negative == 0){
+        if (this->parts.size()<other.parts.size()) return 0;
+        if (this->parts.size()>other.parts.size()) return 1;
+        for (size_t i = this->parts.size(); i > 0 ; i--)
+        {
+            size_t idx = i-1;
+            if(this->parts[idx]>other.parts[idx]) return 1;
+        }
+    }
+    if (this->negative == 1 && other.negative == 1){
+        if (this->parts.size()<other.parts.size()) return 1;
+        if (this->parts.size()>other.parts.size()) return 0;
+        for (size_t i = this->parts.size(); i >0 ; i--)
+        {
+            size_t idx = i-1;
+            if(this->parts[idx]<other.parts[idx]) return 1;
+        }
+    }
+    return 0;
+}
 
 bool bignum::bigint::operator!=(bigint &other) const{
     return !(*this==other);
+}
+
+bool bignum::bigint::operator>=(bigint &other) const {
+    return !(*this<other);
+}
+
+bool bignum::bigint::operator<=(bigint &other) const {
+    return !(*this>other);
 }
