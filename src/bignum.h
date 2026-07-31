@@ -14,14 +14,24 @@ namespace bignum {
         }
         bool is_zero() const;
         bool is_negative() const { return negative; }
-        bigint& add(const bigint &add);
-        bigint& sub(const bigint &other);
+        bigint& add(bigint &add);
+        bigint& sub(bigint &other);
         std::string to_str();
         bigint operator~() &&;
         bigint operator~() const &;
-        bigint& operator+=(bigint& other){
-            return add(other);
+        bigint& operator=(bigint& other){
+            this->parts=other.parts;
         }
+        bigint& operator+=(bigint& other){
+            return this->add(other);
+        }
+        bigint& operator-=(bigint& other){
+            return this->sub(other);
+        }
+        void reverse_negative(){
+            this->negative = !this->negative;
+        }
+        int abs_compare(bigint &other) const;
         bigint operator-() &&;
         bigint operator-() const &;
         bool operator==(bigint &other) const;
@@ -60,8 +70,8 @@ namespace bignum {
         bool negative = 0;
         uint64_t str_to_uint64_t(const char* start,size_t count);
         uint64_t div_by_1e19(std::vector<uint64_t> &vec, uint64_t divisor);
-        bigint& add_unsigned(const bigint &add);
-        bigint& add_signed(const bigint &add);
+        bigint& add_unsigned(bigint &add);
+        bigint& add_signed(bigint &add);
         void multiply_add(uint64_t mult, uint64_t add);
     };
 }

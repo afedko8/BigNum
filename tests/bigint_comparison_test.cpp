@@ -253,3 +253,25 @@ TEST(BigintGreaterOrEqual_True, T37) { bigint a("1234567890123456789012345678901
 TEST(BigintGreaterOrEqual_True, T38) { bigint a("-12345678901234567890123456789012345678901234567890"); bigint b("-12345678901234567890123456789012345678901234567891"); EXPECT_TRUE(a >= b); }
 TEST(BigintGreaterOrEqual_True, T39) { bigint a("99999999999999999999999999999999999999999999999999"); bigint b("99999999999999999999999999999999999999999999999998"); EXPECT_TRUE(a >= b); }
 TEST(BigintGreaterOrEqual_True, T40) { bigint a("-99999999999999999999999999999999999999999999999998"); bigint b("-99999999999999999999999999999999999999999999999999"); EXPECT_TRUE(a >= b); }
+
+// ==================== abs_compare ====================
+TEST(AbsCompareTest, T1) { bigint a("0"); bigint b("0"); EXPECT_TRUE(a.abs_compare(b) == 0); }
+TEST(AbsCompareTest, T2) { bigint a("1"); bigint b("0"); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T3) { bigint a("0"); bigint b("100"); EXPECT_TRUE(a.abs_compare(b) == -1); }
+TEST(AbsCompareTest, T4) { bigint a("12345"); bigint b("12345"); EXPECT_TRUE(a.abs_compare(b) == 0); }
+TEST(AbsCompareTest, T5) { bigint a("99999"); bigint b("100000"); EXPECT_TRUE(a.abs_compare(b) == -1); }
+TEST(AbsCompareTest, T6) { bigint a("18446744073709551615"); bigint b("18446744073709551614"); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T7) { bigint a("18446744073709551615"); bigint b("18446744073709551615"); EXPECT_TRUE(a.abs_compare(b) == 0); }
+TEST(AbsCompareTest, T8) { bigint a("18446744073709551616"); bigint b("18446744073709551615"); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T9) { bigint a("18446744073709551616"); bigint b("18446744073709551616"); EXPECT_TRUE(a.abs_compare(b) == 0); }
+TEST(AbsCompareTest, T10) { bigint a("-18446744073709551616"); bigint b("-18446744073709551615"); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T11) { bigint a("1000000000000000000000000000000"); bigint b("1000000000000000000000000000000"); EXPECT_TRUE(a.abs_compare(b) == 0); }
+TEST(AbsCompareTest, T12) { bigint a("1000000000000000000000000000000"); bigint b("100000000000000000000000000000"); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T13) { bigint a("999999999999999999999999999999"); bigint b("999999999999999999999999999998"); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T14) { bigint a(std::string(50, '1')); bigint b(std::string(49, '9')); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T15) { bigint a("1" + std::string(98, '0') + "2"); bigint b("1" + std::string(98, '0') + "1"); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T16) { bigint a("1" + std::string(100, '0')); bigint b(std::string(101, '9')); EXPECT_TRUE(a.abs_compare(b) == -1); }
+TEST(AbsCompareTest, T17) { bigint a("1" + std::string(200, '0')); bigint b("1" + std::string(200, '0')); EXPECT_TRUE(a.abs_compare(b) == 0); }
+TEST(AbsCompareTest, T18) { bigint a("5" + std::string(199, '0')); bigint b("4" + std::string(199, '0')); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T19) { bigint a(std::string(50, '7')); bigint b("0"); EXPECT_TRUE(a.abs_compare(b) == 1); }
+TEST(AbsCompareTest, T20) { bigint a(std::string(40, '1')); bigint b(std::string(39, '1') + "0"); EXPECT_TRUE(a.abs_compare(b) == 1); }

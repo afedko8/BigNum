@@ -15,7 +15,7 @@ add_executable(big_num src/main.cpp)
 target_link_libraries(big_num PRIVATE bignum_lib)
 
 find_package(GTest REQUIRED)
-add_executable(run_tests tests/test_main.cpp tests/bigint_comparison_test.cpp)
+add_executable(run_tests tests/test_main.cpp tests/bigint_comparison_test.cpp tests/bigint_math_oper.cpp)
 target_link_libraries(run_tests PRIVATE bignum_lib GTest::gtest GTest::gtest_main)
 
 include(CTest)

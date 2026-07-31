@@ -113,32 +113,80 @@ std::string bignum::bigint::to_str(){
     return result;
 }
 
-bignum::bigint& bignum::bigint::add(const bigint & add){
+bignum::bigint& bignum::bigint::add_signed(bigint& other) {
+    int cmp = this->abs_compare(other);
+    if (cmp == 0) {
+        this->parts = {0};
+        this->negative = false;
+        return *this;
+    }
+    constexpr unsigned __int128 BASE = (unsigned __int128)1 << 64;
+    if (cmp == 1) {
+        uint64_t borrow = 0;
+        for (size_t i = 0; i < this->parts.size(); ++i) {
+            uint64_t subtrahend = (i < other.parts.size()) ? other.parts[i] : 0;
+            unsigned __int128 sub = (unsigned __int128)this->parts[i] - subtrahend - borrow;
+            if (sub >= BASE) {
+                sub += BASE;
+                borrow = 1;
+            } else {
+                borrow = 0;
+            }
+            this->parts[i] = (uint64_t)sub;
+        }
+    } else { 
+        std::vector<uint64_t> res = other.parts;
+        uint64_t borrow = 0;
+        for (size_t i = 0; i < res.size(); ++i) {
+            uint64_t subtrahend = (i < this->parts.size()) ? this->parts[i] : 0;
+            unsigned __int128 sub = (unsigned __int128)res[i] - subtrahend - borrow;
+            if (sub >= BASE) {
+                sub += BASE;
+                borrow = 1;
+            } else {
+                borrow = 0;
+            }
+            res[i] = (uint64_t)sub;
+        }
+        this->parts = std::move(res);
+        this->negative = other.negative;
+    }
+    while (this->parts.size() > 1 && this->parts.back() == 0)
+        this->parts.pop_back();
+
+    return *this;
+}
+
+bignum::bigint& bignum::bigint::add(bigint & add){
     if (this->negative == add.negative)
     {
         this->add_unsigned(add);
     }else{
-
+        this->add_signed(add);
     }
     return *this;   
 }
 
-bignum::bigint& bignum::bigint::add_unsigned(const bigint &add){
+bignum::bigint& bignum::bigint::add_unsigned(bigint &add) {
     size_t maxi = std::max(this->parts.size(), add.parts.size());
-    this->parts.resize(maxi,0);
-    bool carry=0;
-    for (size_t i = 0; i < maxi; ++i)
-    {
-        uint64_t sum = this->parts[i]+((i<add.parts.size()) ? add.parts[i]:0);
-        bool new_carry = (sum<this->parts[i]) ? 1:0; 
-        if(carry){
-            ++sum;
-            if(sum==0) new_carry = 1;
+    this->parts.resize(maxi, 0);
+    bool carry = 0;
+    for (size_t i = 0; i < maxi; ++i) {
+        uint64_t a = this->parts[i];
+        uint64_t b = (i < add.parts.size()) ? add.parts[i] : 0;
+        uint64_t sum = a + b;
+        bool carry1 = (sum < a);
+        if (carry) {
+            uint64_t sum2 = sum + 1;
+            bool carry2 = (sum2 < sum);  
+            carry = carry1 || carry2;
+            this->parts[i] = sum2;
+        } else {
+            carry = carry1;
+            this->parts[i] = sum;
         }
-        parts[i]=sum;
-        carry=new_carry;
     }
-    if(carry) parts.push_back(1ULL);
+    if (carry) this->parts.push_back(1ULL);
     return *this;
 }
 
@@ -158,13 +206,11 @@ bignum::bigint bignum::bigint::operator~() &&{
     return std::move(*this);
 }
 
-// bignum::bigint& bignum::bigint::sub(const bigint &other){
-
-// }
-
-// bool bignum::bigint::compare_abs(bigint &other) const{
-
-// }
+bignum::bigint& bignum::bigint::sub(bigint &other){
+    other.reverse_negative();
+    this->add(other);
+    return *this;
+}
 
 bool bignum::bigint::is_zero() const{
     return this->parts.size()==1 && this->parts[0]==0;
@@ -261,4 +307,13 @@ bool bignum::bigint::operator>=(bigint &other) const {
 
 bool bignum::bigint::operator<=(bigint &other) const {
     return !(*this>other);
+}
+
+int bignum::bigint::abs_compare(bigint& other) const {
+    if (parts.size() != other.parts.size())
+        return parts.size() < other.parts.size() ? -1 : 1;
+    for (size_t i = parts.size(); i-- > 0; )
+            if (parts[i] != other.parts[i])
+                return parts[i] < other.parts[i] ? -1 : 1;
+    return 0;
 }

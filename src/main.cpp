@@ -2,10 +2,8 @@
 #include"bignum.h"
 using namespace bignum;
 int main(){
-    bigint a1("-1000");
-    bigint b1("-500");
-    bool f = a1>=b1;
-    bool f1 = a1<b1;
-    std::cout<< f << ' ' << f1;
+    bigint a("20"); 
+    bigint b("100");
+    std::cout<<(a+=b).to_str();
     return 0;
 }
